@@ -15,8 +15,7 @@ const char* sunxi_sensor_get_name(int sensornr)
 {
 	switch(sensornr) {
 	case 0: return "cpu_temp";
-	case 1: return "gpu_temp0";
-	case 2: return "gpu_temp1";
+	case 1: return "gpu_temp";
 	}
 
 	return NULL;
@@ -27,7 +26,6 @@ uint32_t sunxi_sensor_get_value(int sensornr)
 	switch(sensornr) {
 	case 0:
 	case 1:
-	case 2:
 		return sunxi_ths_read_temp(sensornr);
 	}
 
@@ -36,5 +34,5 @@ uint32_t sunxi_sensor_get_value(int sensornr)
 
 int sunxi_sensors_nr_sensors(void)
 {
-	return 3;
+	return 2;
 }

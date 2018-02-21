@@ -50,13 +50,15 @@
 
 #define BIT(n) (1U << (n))
 
-/* temperature = ( MINUPA - reg * MULPA) / DIVPA */
-#define MULPA	25000
-#define DIVPA	214
-#define MINUPA	2170
 static int sun50_th_reg_to_temp(uint32_t reg_data)
 {
-	return ((MINUPA - (int)reg_data) * MULPA) / DIVPA;
+	uint32_t reg;
+	if (reg_data <= 0x500)
+		{ reg = (2590000 - (reg_data * 1452)) / 10; }
+	else
+		{ reg = (2230000 - (reg_data * 1191)) / 10; }
+
+	return (int)reg;
 }
 
 /* Initialize the temperature sensor */
@@ -76,8 +78,6 @@ static int init_ths(void)
 	reg = mmio_read_32(CCU_BASE + BUS_CLK_GATING_REG2);
 	mmio_write_32(CCU_BASE + BUS_CLK_GATING_REG2, reg | BIT(8));
 
-	/* start calibration */
-	mmio_write_32(THS_BASE + 0x04, BIT(17));
 	/* set aquire times */
 	mmio_write_32(THS_BASE + 0x00, 0x190);
 	mmio_write_32(THS_BASE + 0x40, 0x190 << 16);
@@ -85,7 +85,7 @@ static int init_ths(void)
 	mmio_write_32(THS_BASE + 0x70, 0x06);
 	/* enable sensors 0-2 (CPU & GPUs) measurement */
 	reg = mmio_read_32(THS_BASE + 0x40);
-	mmio_write_32(THS_BASE + 0x40, reg | BIT(0) | BIT(1) | BIT(2));
+	mmio_write_32(THS_BASE + 0x40, reg | BIT(0) | BIT(1));
 
 	return 0;
 }
@@ -110,7 +110,7 @@ int sunxi_ths_read_temp(int sensor)
 {
 	int reg;
 
-	if (sensor < 0 || sensor > 2)
+	if (sensor < 0 || sensor > 1)
 		return ~0;
 
 	reg = mmio_read_32(THS_BASE + 0x80 + (4 * sensor));
