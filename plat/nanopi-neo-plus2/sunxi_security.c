@@ -59,7 +59,7 @@ void sunxi_security_setup(void)
 		mmio_write_32(SPC_DECPORT_SET_REG(i), 0xff);
 
 	/* switch RSB to secure */
-	mmio_write_32(SPC_DECPORT_CLR_REG(3), 0x08);
+	/* mmio_write_32(SPC_DECPORT_CLR_REG(3), 0x08); */
 
 	/* set CCMU mbus_sec, bus_sec, pll_sec to non-secure */
 	mmio_write_32(0x01c20000+0x2f0, 0x7);
